@@ -130,3 +130,68 @@ class CloudStorage:
         blob = bucket.blob(name_file)
         blob.delete()
         logging.info("INFO File {} deleted.".format(blob.name) , extra={"json_fields": trace_id})
+
+    
+    @decorator_try_except
+    def delete_bucket(self, bucket_name: str):
+        """
+        Deletes a bucket and all its contents.
+        Args:
+            bucket_name (str): The name of the bucket to be deleted.
+        """
+        bucket = self.storage_client.get_bucket(bucket_name)
+        bucket.delete()
+        logging.info("INFO Bucket {} deleted.".format(bucket.name) , extra={"json_fields": trace_id})
+
+
+    @decorator_try_except
+    def download_object(self, bucket_name: str, file_name: str, output_file_name: str):
+        """
+        Downloads an object from a bucket to a local file.
+        Args:
+            bucket_name (str): The name of the target bucket.
+            file_name (str): The name of the object in the bucket.
+            output_file_name (str): The name of the local output file.
+        """
+        bucket = self.storage_client.get_bucket(bucket_name)
+        blob = bucket.get_blob(file_name)
+        blob.download_to_filename(output_file_name)
+
+    @decorator_try_except
+    def json_to_dataframe(self, bucket_name: str, name_file: str, folder: str = None) -> pd.DataFrame:
+        """
+        Converts a JSON object in a file in the bucket to a Pandas DataFrame.
+        Args:
+            bucket_name (str): The name of the target bucket.
+            name_file (str): The name of the JSON file in the bucket.
+            folder (str, optional): The folder in the bucket where the file is stored.
+
+        Returns:
+            pd.DataFrame: A Pandas DataFrame representing the JSON data.
+        """
+        if folder is not None:
+                name_file = f"{folder}/{name_file}"
+        bucket = self.storage_client.get_bucket(bucket_name)
+        blob = bucket.blob(name_file)
+        json_string = blob.download_as_text()
+        data_frame = pd.read_json(json_string)
+        return data_frame
+    
+    @decorator_try_except
+    def json_envelope_to_dataframe(self, bucket_name: str, name_file: str, folder: str = None) -> pd.DataFrame:
+        """
+        Converts a JSON object with an envelope in a file in the bucket to a Pandas DataFrame.
+        Args:
+            bucket_name (str): The name of the target bucket.
+            name_file (str): The name of the JSON file in the bucket.
+            folder (str, optional): The folder in the bucket where the file is stored.
+        """
+        if folder is not None:
+                name_file = f"{folder}/{name_file}"
+        bucket = self.storage_client.get_bucket(bucket_name)
+        blob = bucket.blob(name_file)
+        json_dict = json.loads(blob.download_as_text())
+        data_frame = pd.DataFrame(json_dict['content'])
+        for key, value in json_dict['envelope'].items():
+            data_frame[key] = value 
+        return data_frame
