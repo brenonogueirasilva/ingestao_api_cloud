@@ -27,3 +27,17 @@ class CloudStorage:
         """ 
         bucket = self.storage_client.create_bucket(bucket_name, location=location)     
         return f'Bucket {bucket.name} successfully created.'
+    
+    @decorator_try_except
+    def list_buckets(self):
+        """
+        Lists all buckets in the Google Cloud project.
+
+        Returns:
+            List[str]: A list of bucket names.
+        """
+        buckets = self.storage_client.list_buckets()
+        list_buckets = []
+        for item in buckets:
+            list_buckets.append(item.name)
+        return list_buckets
