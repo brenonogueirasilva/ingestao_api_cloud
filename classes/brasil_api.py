@@ -47,3 +47,19 @@ class BrasilApi:
         except requests.exceptions.RequestException as error:
             logging.error("ERROR There was an error in your solicitation" , extra={"json_fields": trace_id})
             logging.error("ERROR" + error , extra={"json_fields": trace_id})
+
+    def generate_name_file(self) -> str:
+        '''
+        Generates a file name based on the query and path parameters specified.
+
+        Returns:
+            str: The generated file name.
+        '''
+        name_file = self.endpoint.split('/')
+        name_file = list(filter(lambda item : 'v' not in item and len(item) > 1, name_file))
+        name_file = "_".join(name_file)
+        if self.path_parameter is not None:
+            name_file = f"{name_file}_path({self.path_parameter})" 
+        for key, value in self.query_parameter.items():
+            name_file = f"{name_file}_{key}({value}).json" 
+        return name_file
