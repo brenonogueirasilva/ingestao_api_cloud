@@ -15,3 +15,15 @@ class CloudStorage:
     """
     def __init__(self):
         self.storage_client = storage.Client()
+    
+    @decorator_try_except
+    def create_bucket(self, bucket_name: str, location : str ='us-central1'):
+        """
+        Creates a new bucket in Google Cloud Storage.
+        Args:
+            bucket_name (str): The name of the bucket to be created.
+            storage_class (str, optional): The storage class of the bucket. Default is 'STANDARD'.
+            location (str, optional): The location of the bucket. Default is 'us-central1'.
+        """ 
+        bucket = self.storage_client.create_bucket(bucket_name, location=location)     
+        return f'Bucket {bucket.name} successfully created.'
