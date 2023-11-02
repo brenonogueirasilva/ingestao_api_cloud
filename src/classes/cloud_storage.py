@@ -77,3 +77,26 @@ class CloudStorage:
         json_bytes = json_string.encode('utf-8')
         blob.upload_from_string(json_bytes, content_type='application/json') 
         logging.info('INFO Request Object uploaded with sucess' , extra={"json_fields": trace_id})
+
+    @decorator_try_except
+    def request_to_json_envelope_file(self, bucket_name, object_request: requests.Response, name_file: str, envelope: dict, folder = None):
+        """
+        Uploads a JSON object with an envelope from a request response into a file in the bucket.
+        Args:
+            bucket_name (str): The name of the target bucket.
+            object_request (requests.Response): The response from the request containing the JSON.
+            name_file (str): The name of the file in the bucket.
+            envelope: The envelope to be included in the JSON file.
+            folder (str, optional): The folder in the bucket where the file will be stored.
+        """
+        if folder is not None:
+            name_file = f"{folder}/{name_file}"
+        bucket = self.storage_client.get_bucket(bucket_name)
+        blob = bucket.blob(name_file)
+        json_content = {}
+        json_content['envelope'] = envelope['envelope']
+        json_content['content'] = object_request.json()
+        json_string = json.dumps(json_content)
+        json_bytes = json_string.encode('utf-8')
+        blob.upload_from_string(json_bytes, content_type='application/json') 
+        logging.info('INFO Request Object with envelope uploaded with sucess' , extra={"json_fields": trace_id})
