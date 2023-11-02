@@ -49,3 +49,17 @@ class BigQuery:
         table = dataset.table(table_name)
         self.client.delete_table(table)
         logging.info('INFO Table Deleted with Sucess'  , extra={"json_fields": trace_id})
+
+    def insert_dataframe_append(self, dataset_name: str, table_name: str, dataframe: str):
+        """
+        Append data from a DataFrame to a BigQuery table.
+        Args:
+            dataset_name (str): The name of the dataset.
+            table_name (str): The name of the table.
+            dataframe (pandas.DataFrame): The DataFrame containing data to be appended.
+        """
+        dataset = self.client.dataset(dataset_name)
+        table = dataset.table(table_name)
+        job = self.client.load_table_from_dataframe(dataframe, table)
+        job.result()
+        logging.info('INFO Dataframe append with sucess'  , extra={"json_fields": trace_id})
