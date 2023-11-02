@@ -100,3 +100,20 @@ class CloudStorage:
         json_bytes = json_string.encode('utf-8')
         blob.upload_from_string(json_bytes, content_type='application/json') 
         logging.info('INFO Request Object with envelope uploaded with sucess' , extra={"json_fields": trace_id})
+
+
+    @decorator_try_except
+    def list_objects_buckets(self, bucket_name: str, folder = None) -> str:
+        """
+        Lists all objects in a specified bucket.
+        Args:
+            bucket_name (str): The name of the target bucket.
+        """
+        bucket = self.storage_client.get_bucket(bucket_name)
+        blobs = bucket.list_blobs()
+        list_files = []
+        for item in blobs:
+            list_files.append(item.name)
+        if folder is not None:
+            list_files = list(filter(lambda item : folder in item, list_files))
+        return list_files
