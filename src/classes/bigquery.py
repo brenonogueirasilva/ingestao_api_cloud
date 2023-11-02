@@ -36,3 +36,16 @@ class BigQuery:
         """
         self.client.create_dataset(dataset_name)
         logging.info('INFO DataSet created with sucess'  , extra={"json_fields": trace_id})
+
+    def delete_table(self, dataset_name: str, table_name: str):
+        """
+        Delete a table in a BigQuery dataset.
+
+        Args:
+            dataset_name (str): The name of the dataset.
+            table_name (str): The name of the table to be deleted.
+        """
+        dataset = self.client.dataset(dataset_name)
+        table = dataset.table(table_name)
+        self.client.delete_table(table)
+        logging.info('INFO Table Deleted with Sucess'  , extra={"json_fields": trace_id})
