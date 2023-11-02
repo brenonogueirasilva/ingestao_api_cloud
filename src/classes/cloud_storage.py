@@ -41,3 +41,20 @@ class CloudStorage:
         for item in buckets:
             list_buckets.append(item.name)
         return list_buckets
+    
+    @decorator_try_except
+    def upload_object(self, bucket_name: str, name_file: str, source_file_name: str, folder: str=None):
+        """
+        Uploads an object to a bucket in Google Cloud Storage.
+        Args:
+            bucket_name (str): The name of the target bucket.
+            name_file (str): The name of the file in the bucket.
+            source_file_name (str): The name of the local source file.
+            folder (str, optional): The folder in the bucket where the file will be stored.
+        """
+        if folder is not None:
+            name_file = f"{folder}/{name_file}"
+        bucket = self.storage_client.get_bucket(bucket_name)
+        blob = bucket.blob(name_file)
+        blob.upload_from_filename(source_file_name)
+        logging.info('Object Uploaded with Sucess' , extra={"json_fields": trace_id})
