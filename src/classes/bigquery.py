@@ -25,3 +25,14 @@ class BigQuery:
         query_job = self.client.query(sql_query) 
         dataframe = query_job.to_dataframe()
         return dataframe
+    
+    @decorator_try_except
+    def create_dataset(self, dataset_name: str):
+        """
+        Create a new dataset in BigQuery.
+
+        Args:
+            dataset_name (str): The name of the dataset to be created.
+        """
+        self.client.create_dataset(dataset_name)
+        logging.info('INFO DataSet created with sucess'  , extra={"json_fields": trace_id})
