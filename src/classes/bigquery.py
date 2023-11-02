@@ -11,3 +11,17 @@ class BigQuery:
     """
     def __init__(self):
         self.client = bigquery.Client()
+
+    @decorator_try_except
+    def select(self, sql_query: str) ->pd.DataFrame:
+        """
+        Execute a SQL query in BigQuery and return the results as a DataFrame.
+        Args:
+            sql_query (str): The SQL query to be executed.
+
+        Returns:
+            pandas.DataFrame: A DataFrame containing the query results.
+        """
+        query_job = self.client.query(sql_query) 
+        dataframe = query_job.to_dataframe()
+        return dataframe
