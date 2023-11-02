@@ -63,3 +63,20 @@ class BrasilApi:
         for key, value in self.query_parameter.items():
             name_file = f"{name_file}_{key}({value}).json" 
         return name_file
+    
+    def generate_envelope(self) -> dict:
+        '''
+        Generates a dictionary with meta data (envelope)
+
+        Returns:
+            str: The generated dictionary with a envelope content 
+        '''
+        envelope_content = {}
+        envelope_content['endpoint'] = self.endpoint
+        if self.path_parameter is not None:
+            envelope_content['path'] = self.path_parameter
+        for key, value in self.query_parameter.items():
+            envelope_content[key] = value
+        envelope = {}
+        envelope['envelope'] = envelope_content
+        return envelope
