@@ -117,3 +117,16 @@ class CloudStorage:
         if folder is not None:
             list_files = list(filter(lambda item : folder in item, list_files))
         return list_files
+    
+    @decorator_try_except
+    def delete_file(self, bucket_name: str, name_file: str):
+        """
+        Deletes a file from a bucket.
+        Args:
+            bucket_name (str): The name of the target bucket.
+            name_file (str): The name of the file to be deleted.
+        """
+        bucket = self.storage_client.get_bucket(bucket_name)
+        blob = bucket.blob(name_file)
+        blob.delete()
+        logging.info("INFO File {} deleted.".format(blob.name) , extra={"json_fields": trace_id})
