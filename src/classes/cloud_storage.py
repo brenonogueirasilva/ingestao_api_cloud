@@ -58,3 +58,22 @@ class CloudStorage:
         blob = bucket.blob(name_file)
         blob.upload_from_filename(source_file_name)
         logging.info('Object Uploaded with Sucess' , extra={"json_fields": trace_id})
+
+    @decorator_try_except
+    def request_to_json_file(self, bucket_name: str, object_request: requests.Response, name_file: str, folder: str = None):
+        """
+        Uploads a JSON object from a request response into a json file in the bucket.
+        Args:
+            bucket_name (str): The name of the target bucket.
+            object_request (requests.Response): The response from the request containing the JSON.
+            name_file (str): The name of the file in the bucket.
+            folder (str, optional): The folder in the bucket where the file will be stored.
+        """
+        if folder is not None:
+            name_file = f"{folder}/{name_file}"
+        bucket = self.storage_client.get_bucket(bucket_name)
+        blob = bucket.blob(name_file)
+        json_string = json.dumps(object_request.json())
+        json_bytes = json_string.encode('utf-8')
+        blob.upload_from_string(json_bytes, content_type='application/json') 
+        logging.info('INFO Request Object uploaded with sucess' , extra={"json_fields": trace_id})
