@@ -61,3 +61,22 @@ class ApiOrquestrator:
             response = obj_brasil_api.request_get()
             name_file = obj_brasil_api.generate_name_file()
             self.storage_object.request_to_json_file(self.bucket, response, name_file, self.download_folder)
+
+    def execute_requests_envelope_save_file(self):
+        """
+        Execute API requests, envelope responses, and save to JSON files.
+        """
+        ls_query_path_parameters = self.generate_list_query__path_parameters()
+        for dict_query_parameters in ls_query_path_parameters:
+            obj_brasil_api = BrasilApi(
+                endpoint= self.endpoint,
+                query_parameter= dict_query_parameters['query_parameter'],
+                path_parameter= dict_query_parameters['path'] 
+            )
+            response = obj_brasil_api.request_get()
+            envelope = obj_brasil_api.generate_envelope()
+            name_file = obj_brasil_api.generate_name_file()
+            json_payload ={'trace_id' : trace_id_value, 'content' : envelope['envelope']}
+            print(json_payload)
+            logging.info('Executing Requests with envelope and save file in cloud storage', extra={"json_fields": json_payload})
+            self.storage_object.request_to_json_envelope_file(self.bucket, response, name_file, envelope, self.download_folder)
