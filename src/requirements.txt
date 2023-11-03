@@ -1,0 +1,6 @@
+requests==2.31.0
+pandas==2.0.2
+pyarrow
+google-cloud-storage
+google-cloud-bigquery
+google-cloud-logging
