@@ -26,3 +26,23 @@ class ApiOrquestrator:
         self.download_folder = download_folder
         self.storage_object = CloudStorage()
         self.big_query = BigQuery()
+
+    def generate_list_query__path_parameters(self) -> list:
+        """
+        Generate a list of dictionaries with combined query and path parameters.
+
+        Returns:
+            list: A list of dictionaries, each containing 'path' and 'query_parameter' keys.
+        """
+        query_parameter = self.query_parameters.copy()
+        for key, value in query_parameter.items():
+            query_parameter[key] = [value] 
+        df_parameters = pd.DataFrame(query_parameter)
+        for column in df_parameters.columns:
+            df_parameters = df_parameters.explode(column)
+        ls_query_parameters = df_parameters.to_dict(orient='records')
+        ls_parameters = []            
+        for path in self.path_parameters:
+            for query in ls_query_parameters:
+                ls_parameters.append( {'path' : path, 'query_parameter' : query} )
+        return ls_parameters
