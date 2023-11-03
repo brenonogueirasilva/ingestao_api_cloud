@@ -80,3 +80,12 @@ class ApiOrquestrator:
             print(json_payload)
             logging.info('Executing Requests with envelope and save file in cloud storage', extra={"json_fields": json_payload})
             self.storage_object.request_to_json_envelope_file(self.bucket, response, name_file, envelope, self.download_folder)
+
+    def json_files_to_big_query(self, bucket_name: str, folder_name: str):
+        '''
+        Open Json files from CloudStorage and save into big query
+        '''
+        for item in self.storage_object.list_objects_buckets(bucket_name, folder_name):
+            df = self.storage_object.json_envelope_to_dataframe(bucket_name, item)
+            logging.info(f'Opening json file: {folder_name} with envelope and save file in bigquery' , extra={"json_fields": trace_id})
+            self.big_query.insert_dataframe_append('brasil_api', 'municipios', df)
